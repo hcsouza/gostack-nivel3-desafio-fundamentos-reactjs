@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import FileList from '../../components/FileList';
 import Upload from '../../components/Upload';
 
-import { Container, Title, ImportFileContainer, Footer } from './styles';
+import { Container, Title, ImportFileContainer, Footer, MessageBox } from './styles';
 
 import alert from '../../assets/alert.svg';
 import api from '../../services/api';
@@ -20,22 +20,26 @@ interface FileProps {
 
 const Import: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
+  const [successImport, setSuccessImport] = useState('');
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
-
-    // TODO
+    const data = new FormData();
+    data.append('file', uploadedFiles[0].file, uploadedFiles[0].name);
 
     try {
-      // await api.post('/transactions/import', data);
+      const response = await api.post('/transactions/import', data);
+      setSuccessImport(response.data.status);
+      setUploadedFiles([]);
     } catch (err) {
-      // console.log(err.response.error);
+      console.log(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    setSuccessImport('');
+    const file:FileProps = {file: files[0], name: files[0].name, readableSize: files[0].size.toString()}
+    setUploadedFiles([...uploadedFiles, file]);
   }
 
   return (
@@ -44,9 +48,10 @@ const Import: React.FC = () => {
       <Container>
         <Title>Importar uma transação</Title>
         <ImportFileContainer>
+        { !!successImport && <MessageBox><strong>Importação feita com sucesso!</strong></MessageBox> }
+
           <Upload onUpload={submitFile} />
           {!!uploadedFiles.length && <FileList files={uploadedFiles} />}
-
           <Footer>
             <p>
               <img src={alert} alt="Alert" />

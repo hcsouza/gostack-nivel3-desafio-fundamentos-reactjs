@@ -54,3 +54,10 @@ export const Footer = styled.section`
     }
   }
 `;
+
+export const MessageBox = styled.div`
+  display:flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: #12A454;
+`;
